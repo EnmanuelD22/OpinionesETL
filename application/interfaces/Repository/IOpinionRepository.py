@@ -3,5 +3,5 @@ import pandas as pd
 
 class IOpinionRepository(ABC):
     @abstractmethod
-    def save_opiniones(self, df: pd.DataFrame) -> init:
+    def save_dataframe(self, df: pd.DataFrame, nombre_tabla) -> int:
         pass

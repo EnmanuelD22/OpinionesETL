@@ -3,33 +3,47 @@ from infrastructure.extractors.db_extractor import DBExtractor
 from infrastructure.extractors.api_extractor import APIExtractor
 from infrastructure.database import engine
 from application.extraction_service import ExtractionService
+from application.transformation_service import TransformationService 
+# --- NUEVAS IMPORTACIONES ---
+from infrastructure.repositories.opinion_repository import SQLOpinionRepository
+from application.loading_service import LoadingService
 
-def test_orquestador():
-    print("Iniciando prueba del Orquestador de Extracción...\n")
+def test_pipeline():
+    print("Iniciando Pipeline ETL...\n")
     
-    # 1. Preparamos las herramientas (Infraestructura)
-    csv_ext = CSVExtractor("data/clients.csv")
+    # ==========================================
+    # FASE 1: EXTRACCIÓN (E)
+    # ==========================================
+    mis_extractores = {
+        "clientes_csv": CSVExtractor("data/clients.csv"),
+        "productos_csv": CSVExtractor("data/products.csv"),
+        "fuente_datos_csv": CSVExtractor("data/fuente_datos.csv")
+    }
     
-    # Consulta de prueba que devuelve la versión de tu SQL Server
-    db_ext = DBExtractor("SELECT @@VERSION AS Version", engine) 
+    servicio_extraccion = ExtractionService(mis_extractores)
+    datos_crudos = servicio_extraccion.extract_all()
     
-    # API pública de prueba que devuelve comentarios falsos
-    api_ext = APIExtractor("https://jsonplaceholder.typicode.com/comments?postId=1")
+    # ==========================================
+    # FASE 2: TRANSFORMACIÓN (T)
+    # ==========================================
+    print("\n--- Iniciando Fase de Transformación ---")
+    transformador = TransformationService()
+    datos_limpios = {}
     
-    # 2. Inyectamos las herramientas al coordinador (Aplicación)
-    servicio = ExtractionService(csv_ext, db_ext, api_ext)
+    for fuente, df in datos_crudos.items():
+        datos_limpios[fuente] = transformador.transform(df, fuente)
+        
+    # ==========================================
+    # FASE 3: CARGA (L)
+    # ==========================================
+    # 1. Instanciamos el repositorio pasándole el motor de la BD
+    repo = SQLOpinionRepository(engine)
     
-    # 3. ¡El coordinador hace todo el trabajo pesado!
-    datos = servicio.extract_all()
+    # 2. Se lo inyectamos al servicio de carga
+    servicio_carga = LoadingService(repo)
     
-    # 4. Revisamos qué nos entregó
-    print("\n--- Resumen de Datos Extraídos ---")
-    for llave, df in datos.items():
-        print(f"[{llave}]: {len(df)} filas.")
-        if not df.empty:
-            # Imprimimos solo las primeras 2 filas de cada fuente para no llenar toda la pantalla
-            print(df.head(2)) 
-        print("-" * 50)
+    # 3. ¡Ejecutamos la carga!
+    servicio_carga.load_data(datos_limpios)
 
 if __name__ == "__main__":
-    test_orquestador()
+    test_pipeline()

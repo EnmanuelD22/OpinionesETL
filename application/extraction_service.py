@@ -2,19 +2,21 @@ import pandas as pd
 from application.interfaces.Services.IServices import IDataExtractor
 
 class ExtractionService:
-    def __init__(self, csv_ext: IDataExtractor, db_ext: IDataExtractor, api_ext: IDataExtractor):
-        self.csv_ext = csv_ext
-        self.db_ext = db_ext
-        self.api_ext = api_ext
+    """
+    Servicio encargado de orquestar múltiples extractores.
+    """
+    def __init__(self, extractores: dict[str, IDataExtractor]):
+        # Ahora recibimos un diccionario con todos los extractores que queramos
+        self.extractores = extractores
 
     def extract_all(self) -> dict[str, pd.DataFrame]:
-        print("\n--- Iniciando Proceso de Extraccion Global ---")
-
-        datos = {
-            "clientes_csv": self.csv_ext.extract(),
-            "ventas_db": self.db_ext.extract(),
-            "opiniones_api": self.api_ext.extract()
-        }
-
-        print("--- Extraccion Global Finalizada ---\n")
+        print("\n--- Iniciando Proceso de Extracción Global ---")
+        
+        datos = {}
+        # Recorremos cada extractor y lo ejecutamos
+        for nombre, extractor in self.extractores.items():
+            print(f"Extrayendo datos de: {nombre}...")
+            datos[nombre] = extractor.extract()
+            
+        print("--- Extracción Global Finalizada ---\n")
         return datos
