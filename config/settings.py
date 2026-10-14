@@ -15,7 +15,7 @@ class Settings:
     def connection_string(self) -> str:
         if self.DB_TRUSTED_CONNECTION.lower() == "yes":
             return (f"mssql+pyodbc://@{self.DB_SERVER}/{self.DB_NAME}?"
-                f"driver={self.DB_DRIVER}&trusted_connection=yes")
+                    f"driver={self.DB_DRIVER}&trusted_connection=yes&encrypt=yes&trustServerCertificate=yes")
 
 
 settings = Settings()
