@@ -1,8 +1,20 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float
-from domain.entities.base import Base
+"""Entidad de dominio para una fuente de datos."""
 
-class FuenteDatos(Base):
-    __tablename__ = 'Fuente_Datos'
-    IdFuente = Column(Integer, primary_key=True, autoincrement=False)
-    TipoFuente = Column(String(50))
-    FechaCarga = Column(Date)
+#region Imports
+from dataclasses import dataclass
+from datetime import date
+from typing import Optional
+#endregion
+
+
+#region Entity
+@dataclass
+class FuenteDatos:
+    IdFuente: int
+    TipoFuente: str
+    FechaCarga: Optional[date] = None
+
+
+# Compatibilidad con el nombre usado por el esquema legado.
+Fuente_Datos = FuenteDatos
+#endregion

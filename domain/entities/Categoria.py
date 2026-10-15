@@ -1,7 +1,14 @@
-from domain.entities.base import Base
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float
+"""Entidad de dominio para una categoría."""
 
-class Categoria(Base):
-    __tablename__ = 'Categoria'
-    IdCategoria = Column(Integer, primary_key=True, autoincrement=True)
-    Nombre = Column(String(100), nullable=False)
+#region Imports
+from dataclasses import dataclass
+from typing import Optional
+#endregion
+
+
+#region Entity
+@dataclass
+class Categoria:
+    Nombre: str
+    IdCategoria: Optional[int] = None
+#endregion

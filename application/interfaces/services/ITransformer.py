@@ -1,8 +1,20 @@
+"""Puerto para transformar y validar lotes."""
+
+#region Imports
 from abc import ABC, abstractmethod
-import pandas as pd
 from typing import Tuple
 
-class ITransformer(ABC): 
+import pandas as pd
+#endregion
+
+
+#region Port
+class ITransformer(ABC):
+    """Contrato de transformación usado por el caso de uso."""
+
     @abstractmethod
-    def transformar(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, int]: 
-        pass
+    def transformar(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, int]:
+        """Devuelve el lote válido y la cantidad rechazada."""
+
+        raise NotImplementedError
+#endregion

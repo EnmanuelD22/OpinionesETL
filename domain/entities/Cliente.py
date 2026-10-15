@@ -1,8 +1,15 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float
-from domain.entities.base import Base
+"""Entidad de dominio para un cliente."""
 
-class Cliente(Base):
-    __tablename__ = 'Cliente'
-    IdCliente = Column(Integer, primary_key=True, autoincrement=False)
-    Nombre = Column(String(100), nullable=False)
-    email = Column(String(100), nullable=True, unique=True)
+#region Imports
+from dataclasses import dataclass
+from typing import Optional
+#endregion
+
+
+#region Entity
+@dataclass
+class Cliente:
+    IdCliente: int
+    Nombre: str
+    email: Optional[str] = None
+#endregion

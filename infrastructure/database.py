@@ -1,21 +1,27 @@
-import os
+"""Fábrica del motor SQLAlchemy.
+
+Este módulo es infraestructura: es el único lugar donde se construye el
+motor a partir de `config.settings`. La capa de aplicación recibe el motor a
+través de sus adaptadores y nunca importa este módulo.
+"""
+
+#region Imports
 from sqlalchemy import create_engine
-from sqlalchemy.engine import URL
 
-# Conexion a la base de datos
-SERVIDOR = os.getenv("SQL_SERVER", r"EnmanuelDiaz")
-DATA_BASE = os.getenv("SQL_DATABASE", "OpinionesETL")
-ODBC_DRIVER = os.getenv("ODBC_DRIVER", "ODBC Driver 17 for SQL Server")
+from config.settings import settings
+#endregion
 
-CONEXION_STRING = URL.create(
-    "mssql+pyodbc",
-    host=SERVIDOR,
-    database=DATA_BASE,
-    query={
-        "driver": ODBC_DRIVER,
-        "Trusted_Connection": "yes",
-        "TrustServerCertificate": "yes"
-    },
+
+#region Engine
+engine = create_engine(
+    settings.connection_string,
+    echo=False,
+    fast_executemany=True,
 )
 
-engine = create_engine(CONEXION_STRING, echo=False, fast_executemany=True)
+
+def get_engine():
+    """Devuelve el motor configurado para la ejecución actual."""
+
+    return engine
+#endregion
