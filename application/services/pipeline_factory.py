@@ -23,6 +23,14 @@ LoaderFactory = Callable[[str, list[str]], ILoader]
 #endregion
 
 
+#region Catalog identifiers
+
+TIPO_OPINION_ENCUESTA = 1
+TIPO_OPINION_RESENA = 2
+TIPO_OPINION_COMENTARIO_SOCIAL = 3
+
+
+
 #region Schemas
 FUENTES_SCHEMA = DataSchema.from_rules([
     FieldRule("IdFuente", "integer"),
@@ -49,6 +57,7 @@ OPINIONES_SCHEMA = DataSchema.from_rules([
     FieldRule("Comentario", "text"),
     FieldRule("IdFuente", "integer"),
     FieldRule("IdClasificacion", "integer", required=False),
+    FieldRule("IdTipoOpinion", "integer", required=False),
     FieldRule("Puntaje", "number", required=False, minimum=1, maximum=5),
     FieldRule("Canal", "text", required=False, max_length=50),
     FieldRule("IdOrigen", "text", required=False, max_length=50),
@@ -149,11 +158,16 @@ def _pipelines_opiniones(
                 "PuntajeSatisfacciÃƒÆ’Ã‚Â³n": "Puntaje",
             },
             mapas={"IdClasificacion": {"Positiva": 1, "Negativa": 2, "Neutra": 3}},
-            valores_default={"IdFuente": 2, "Canal": "Encuestas", "IdOrigen": "CSV_SURVEY"},
+            valores_default={
+                "IdFuente": 2,
+                "Canal": "Encuestas",
+                "IdOrigen": "CSV_SURVEY",
+                "IdTipoOpinion": TIPO_OPINION_ENCUESTA,
+            },
             referencias=referencias,
             columnas_salida=[
                 "IdCliente", "IdProducto", "IdClasificacion", "IdFuente",
-                "Fecha", "Comentario", "Puntaje", "Canal", "IdOrigen",
+                "IdTipoOpinion", "Fecha", "Comentario", "Puntaje", "Canal", "IdOrigen",
             ],
             esquema=OPINIONES_SCHEMA,
         ),
@@ -162,10 +176,15 @@ def _pipelines_opiniones(
             ["IdCliente", "IdProducto", "Fecha", "Comentario", "IdFuente"],
             ["IdCliente", "IdProducto", "Fecha", "Comentario"],
             data_dir, extractor_factory, loader_factory,
-            valores_default={"IdFuente": 5, "Canal": "Redes Sociales", "IdOrigen": "CSV_SOCIAL"},
+            valores_default={
+                "IdFuente": 5,
+                "Canal": "Redes Sociales",
+                "IdOrigen": "CSV_SOCIAL",
+                "IdTipoOpinion": TIPO_OPINION_COMENTARIO_SOCIAL,
+            },
             referencias=referencias,
             columnas_salida=[
-                "IdCliente", "IdProducto", "IdFuente", "Fecha",
+                "IdCliente", "IdProducto", "IdFuente", "IdTipoOpinion", "Fecha",
                 "Comentario", "Canal", "IdOrigen",
             ],
             esquema=OPINIONES_SCHEMA,
@@ -176,10 +195,15 @@ def _pipelines_opiniones(
             ["IdCliente", "IdProducto", "Fecha", "Comentario"],
             data_dir, extractor_factory, loader_factory,
             renombrar={"Rating": "Puntaje"},
-            valores_default={"IdFuente": 1, "Canal": "Reseñas Web", "IdOrigen": "CSV_WEB"},
+            valores_default={
+                "IdFuente": 1,
+                "Canal": "Reseñas Web",
+                "IdOrigen": "CSV_WEB",
+                "IdTipoOpinion": TIPO_OPINION_RESENA,
+            },
             referencias=referencias,
             columnas_salida=[
-                "IdCliente", "IdProducto", "IdFuente", "Fecha",
+                "IdCliente", "IdProducto", "IdFuente", "IdTipoOpinion", "Fecha",
                 "Comentario", "Puntaje", "Canal", "IdOrigen",
             ],
             esquema=OPINIONES_SCHEMA,

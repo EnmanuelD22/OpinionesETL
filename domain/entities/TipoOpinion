@@ -1,0 +1,24 @@
+"""Entidad de dominio para el tipo de una opinión."""
+
+#region Imports
+from dataclasses import dataclass
+#endregion
+
+
+#region Entity
+@dataclass
+class TipoOpinion:
+    IdTipoOpinion: int
+    Nombre: str
+
+
+ENCUESTA_ID = 1
+RESENA_ID = 2
+COMENTARIO_SOCIAL_ID = 3
+
+CATALOGO_TIPOS_OPINION = (
+    TipoOpinion(ENCUESTA_ID, "Encuesta"),
+    TipoOpinion(RESENA_ID, "Reseña"),
+    TipoOpinion(COMENTARIO_SOCIAL_ID, "Comentario social"),
+)
+#endregion

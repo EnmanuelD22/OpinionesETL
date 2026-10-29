@@ -21,6 +21,7 @@ class Opinion:
     Puntaje: Optional[float] = None
     Canal: Optional[str] = None
     IdOrigen: Optional[str] = None
+    IdTipoOpinion: Optional[int] = None
     IdOpinion: Optional[int] = None
 #endregion
     

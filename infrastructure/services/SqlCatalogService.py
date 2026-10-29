@@ -26,11 +26,12 @@ class SqlCatalogService(ICatalogService):
 
     #region Catalog preparation
     def preparar(self) -> CatalogContext:
-        """Crea tablas y registra clasificaciones y categorías faltantes."""
+        """Crea tablas y registra clasificaciones, tipos de opinión y categorías faltantes."""
 
         try:
             Base.metadata.create_all(self.db_engine)
             self._preparar_clasificaciones()
+            self._preparar_tipos_opinion()
             productos = self.products_extractor.extract()
             self._preparar_categorias(productos)
             return CatalogContext(
@@ -51,6 +52,22 @@ class SqlCatalogService(ICatalogService):
         if not faltantes.empty:
             faltantes.to_sql(
                 "Clasificacion", con=self.db_engine, if_exists="append", index=False
+            )
+
+    def _preparar_tipos_opinion(self) -> None:
+        """Registra los tipos de opinión. Los IDs deben coincidir con los de
+        las constantes TIPO_OPINION_* de la fábrica de pipelines."""
+
+        existentes = self._valores_existentes("TipoOpinion", "IdTipoOpinion")
+        catalogo = pd.DataFrame([
+            {"IdTipoOpinion": 1, "Nombre": "Encuesta"},
+            {"IdTipoOpinion": 2, "Nombre": "Reseña"},
+            {"IdTipoOpinion": 3, "Nombre": "Comentario social"},
+        ])
+        faltantes = catalogo[~catalogo["IdTipoOpinion"].isin(existentes)]
+        if not faltantes.empty:
+            faltantes.to_sql(
+                "TipoOpinion", con=self.db_engine, if_exists="append", index=False
             )
 
     def _preparar_categorias(self, productos: pd.DataFrame) -> None:
@@ -87,6 +104,9 @@ class SqlCatalogService(ICatalogService):
                     "IdFuente": self._valores_existentes("Fuente_Datos", "IdFuente"),
                     "IdClasificacion": self._valores_existentes(
                         "Clasificacion", "IdClasificacion"
+                    ),
+                    "IdTipoOpinion": self._valores_existentes(
+                        "TipoOpinion", "IdTipoOpinion"
                     ),
                 },
             )

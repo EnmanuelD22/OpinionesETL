@@ -26,6 +26,14 @@ class ClasificacionModel(Base):
     Tipo = Column(String(100), nullable=False)
 
 
+class TipoOpinionModel(Base):
+    __tablename__ = "TipoOpinion"
+
+    IdTipoOpinion = Column(Integer, primary_key=True, autoincrement=False)
+    Nombre = Column(String(50), nullable=False, unique=True)
+
+   
+
 class FuenteDatosModel(Base):
     __tablename__ = "Fuente_Datos"
 
@@ -63,4 +71,5 @@ class OpinionModel(Base):
     IdProducto = Column(Integer, ForeignKey("Producto.IdProducto"))
     IdClasificacion = Column(Integer, ForeignKey("Clasificacion.IdClasificacion"))
     IdFuente = Column(Integer, ForeignKey("Fuente_Datos.IdFuente"))
+    IdTipoOpinion = Column(Integer, ForeignKey("TipoOpinion.IdTipoOpinion"))
 #endregion
