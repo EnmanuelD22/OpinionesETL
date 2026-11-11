@@ -8,7 +8,9 @@ from sqlalchemy import create_engine
 
 from config.settings import settings
 
+from application.interfaces.services.ISentimentClassifier import ISentimentClassifier
 from application.services.pipeline_factory import build_etl_application
+from application.services.lexicon_classifier import LexiconClassifier
 from infrastructure.database import get_engine
 from infrastructure.services.CsvExtractor import CsvExtractor
 from infrastructure.services.SqlCatalogService import SqlCatalogService
@@ -25,6 +27,11 @@ def create_loader(table: str, duplicate_keys: list[str]) -> SqlLoader:
     """Construye el adaptador SQL con el motor compartido."""
 
     return SqlLoader(table, duplicate_keys, db_engine=get_engine())
+
+
+def create_sentiment_classifier() -> ISentimentClassifier:
+    """Selecciona la línea base aprobada para el ETL activo."""
+    return LexiconClassifier()
 
 
 def create_application():

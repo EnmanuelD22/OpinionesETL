@@ -14,3 +14,8 @@ __pycache__/
 
 # Logs
 *.log
+
+# Muestras de anotacion y evaluaciones NLP privadas
+evaluation/private/
+.cache/
+reports/

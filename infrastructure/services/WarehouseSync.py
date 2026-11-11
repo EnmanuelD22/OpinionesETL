@@ -1,10 +1,13 @@
 """Carga idempotente de OpinionesETL hacia OpinionesDW."""
 
 from datetime import date
+from math import isfinite
 
 from sqlalchemy import insert, select, update
 
-from application.services.sentiment import clasificar
+from application.interfaces.services.ISentimentClassifier import ISentimentClassifier
+from application.services.lexicon_classifier import LexiconClassifier
+from application.services.sentiment import Prediccion
 from infrastructure.persistence import models as src
 from infrastructure.persistence.warehouse import (
     WarehouseBase, DimClasificacion, DimCliente, DimFecha, DimFuente,
@@ -13,6 +16,7 @@ from infrastructure.persistence.warehouse import (
 
 MESES = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre")
+NLP_BATCH_SIZE = 16
 
 
 def _sincronizar(connection, model, filas):
@@ -35,12 +39,49 @@ def _sincronizar(connection, model, filas):
     return len(nuevos)
 
 
-def sincronizar_warehouse(origen_engine, dw_engine):
+def _predecir_pendientes(opiniones, classifier: ISentimentClassifier):
+    """Valida el lote completo antes de permitir escrituras de predicciones."""
+    pendientes = [op for op in opiniones
+                  if op["IdClasificacion"] is None and op["Prediccion"] is None]
+    if not pendientes:
+        return []
+    comentarios = [op["Comentario"] for op in pendientes]
+    if any(not isinstance(texto, str) or not texto.strip() for texto in comentarios):
+        raise ValueError("No se puede clasificar una opinión sin comentario válido")
+    predicciones = classifier.predict_batch(comentarios, batch_size=NLP_BATCH_SIZE)
+    if not isinstance(predicciones, list) or len(predicciones) != len(pendientes):
+        raise ValueError("El clasificador debe devolver una predicción por opinión")
+    registros = []
+    for opinion, prediccion in zip(pendientes, predicciones):
+        if not isinstance(prediccion, Prediccion):
+            raise ValueError("El clasificador devolvió un resultado inválido")
+        clase = prediccion.id_clasificacion
+        confianza = prediccion.confianza
+        version = prediccion.version
+        if type(clase) is not int or clase not in (1, 2, 3):
+            raise ValueError("El clasificador devolvió una clase inválida")
+        if (isinstance(confianza, bool) or not isinstance(confianza, (int, float))
+                or not isfinite(confianza) or not 0 <= confianza <= 1):
+            raise ValueError("El clasificador devolvió una confianza inválida")
+        if not isinstance(version, str) or not version.strip() or len(version) > 50:
+            raise ValueError("El clasificador devolvió una versión inválida")
+        registros.append({"IdOpinion": opinion["IdOpinion"],
+                          "IdClasificacion": clase, "Confianza": confianza,
+                          "ModeloVersion": version})
+    for opinion, registro in zip(pendientes, registros):
+        opinion["Prediccion"] = registro["IdClasificacion"]
+    return registros
+
+
+def sincronizar_warehouse(origen_engine, dw_engine,
+                          classifier: ISentimentClassifier | None = None):
     """Clasifica opiniones sin etiqueta y carga dimensiones antes que hechos.
 
     La etiqueta original permanece en Opinion. Las predicciones quedan en
     AnalisisOpinion y se usan solamente donde falta la etiqueta original.
     """
+    if classifier is None:
+        classifier = LexiconClassifier()
     src.Base.metadata.create_all(origen_engine)
     WarehouseBase.metadata.create_all(dw_engine)
     o, c, p, cat = src.OpinionModel, src.ClienteModel, src.ProductoModel, src.CategoriaModel
@@ -57,18 +98,11 @@ def sincronizar_warehouse(origen_engine, dw_engine):
         .outerjoin(f, o.IdFuente == f.IdFuente)
         .outerjoin(t, o.IdTipoOpinion == t.IdTipoOpinion)
         .outerjoin(a, o.IdOpinion == a.IdOpinion)
+        .order_by(o.IdOpinion)
     )
     with origen_engine.begin() as connection:
         opiniones = [dict(row) for row in connection.execute(consulta).mappings()]
-        predicciones = []
-        for opinion in opiniones:
-            if opinion["IdClasificacion"] is None and opinion["Prediccion"] is None:
-                prediccion = clasificar(opinion["Comentario"] or "")
-                opinion["Prediccion"] = prediccion.id_clasificacion
-                predicciones.append({"IdOpinion": opinion["IdOpinion"],
-                                     "IdClasificacion": prediccion.id_clasificacion,
-                                     "Confianza": prediccion.confianza,
-                                     "ModeloVersion": prediccion.version})
+        predicciones = _predecir_pendientes(opiniones, classifier)
         if predicciones:
             connection.execute(insert(a), predicciones)
 

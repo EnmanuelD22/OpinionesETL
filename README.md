@@ -133,6 +133,17 @@ extracción desde una tabla SQL y una segunda ejecución sin duplicados.
 
 ## Indicadores y rendimiento
 
+La evaluación previa de NLP se ejecuta con `python -m tools.evaluate_nlp`.
+El procedimiento de anotación y las limitaciones de los datos actuales están
+en [`docs/nlp_evaluation.md`](docs/nlp_evaluation.md).
+El módulo 2 incorpora un modelo candidato en español y lo compara con la línea
+base sin alterar el ETL. Instalación, resultados y criterio de adopción están en
+[`docs/nlp_model_comparison.md`](docs/nlp_model_comparison.md).
+El módulo 3 conecta la interfaz NLP con la carga analítica y conserva el léxico
+como clasificador activo; ver [`docs/nlp_etl_integration.md`](docs/nlp_etl_integration.md).
+El módulo 4 establece el control de calidad y rendimiento previo a promover un
+modelo; ver [`docs/nlp_release_validation.md`](docs/nlp_release_validation.md).
+
 El dashboard local se inicia con `python dashboard.py` y abre en
 `http://127.0.0.1:8765`. Lee `OpinionesDW`, permite filtrar por producto y mes,
 y muestra cantidad, sentimiento, satisfacción y tendencia mensual.

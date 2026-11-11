@@ -1,0 +1,46 @@
+﻿sample_id,canales,comentario,etiqueta_revisada,anotador
+c007b4bf5e3ef88585480fc08746c1beb3cac5593a3c259bfb5f58f91e1ed6fb,Encuesta,"Ni malo ni excelente, simplemente regular.",Neutra,revision_codex_1
+4a9ef8138c4379eccfee5f7666573a3339f9f366e637792984d8126cc7232075,Social,"Información suficiente, sin mayor novedad",Neutra,revision_codex_1
+3a588287f2a3f1bc0f7ba7ae2bad3fc28505205b814a9d1a5ad8805a21d85af7,Web,Gran relación calidad-precio. Muy recomendable.,Positiva,revision_codex_1
+f2a900bcf85a5ff84abf0702b7d221588cfa51a8a963f97cf209b16c3e2a06bf,Encuesta,"Mala calidad, no lo recomiendo para nada.",Negativa,revision_codex_1
+b89b7993000278b17158737d7ec767cb7d08a2b03ea26710521c2247cf5c8236,Social,"Producto recibido, cumple su función",Neutra,revision_codex_1
+4c651088268ec589e97cc030fe9f592f64d9bdedcf92a26ff19d7bdf1ada78f5,Web,"Me encanta este producto, excelente calidad. Muy recomendable.",Positiva,revision_codex_1
+bd7b8736a1f86d215bfee3bd231dd22beabff7b550e9aa219f6682db4ee58437,Encuesta,El producto llegó en perfecto estado y antes de tiempo.,Positiva,revision_codex_1
+a3495c4c6c64db85cd4653c68b0ea25ff7c0443c61118df661e256aaedc6ba4b,Social,Envío tardío y producto dañado,Negativa,revision_codex_1
+25bb0ee81167516b6bd29f4c0a226851363e85245794383775e75498135122fa,Web,Pésima atención al cliente. No volvería a comprar.,Negativa,revision_codex_1
+a9c51bab50027be18abcaafd2bec1acdede07afb5bc0d578ba8f5671a441568c,Encuesta,"La experiencia fue aceptable, aunque podría mejorar.",Neutra,revision_codex_1
+7ba77349dec9bd84a60f6ed0c59263abc178e507f4558bbfcc164e3dbd526c30,Social,Gran relación calidad-precio,Positiva,revision_codex_1
+b19fbd95d8b19ba258feb9676334bd61cc9768a64e90e267470ff859ad2d6044,Web,"Entrega correcta, sin comentarios adicionales. OK.",Neutra,revision_codex_1
+feb1ed96e3a80191f45d677f9fa0780ff65d0a57471ceee40c55e9ab309b497b,Encuesta,"No era lo que esperaba, muy decepcionado.",Negativa,revision_codex_1
+65a4c0d5ecae1223064fe2c374ec55ea5e829b9cccb8870d8bc554c6c9484c53,Social,Satisface lo básico,Neutra,revision_codex_1
+94f224faeba6286c38f2c8bb855b87c2e18535b2459b1609933cc7bff3a67332,Web,"Información suficiente, sin mayor novedad. OK.",Neutra,revision_codex_1
+f0de4e23619e7c1638c76707ffe03b74d48d86751d1bdf1f5ba0510659d502f0,Encuesta,"El servicio fue rápido y eficiente, estoy muy satisfecho.",Positiva,revision_codex_1
+7852ba3a9a72144d4b5ee206b187bd62b679f7763b72df192c8049fd1f01b153,Social,"No funciona como esperaba, decepcionado",Negativa,revision_codex_1
+f8c860130e1a797a9762bca6eb6af63ffd3dc1a9d4c6a596923135013a628012,Web,Envío tardío y producto dañado. No volvería a comprar.,Negativa,revision_codex_1
+68170505c1e155af84edbc8352bc4a8af977fb72334f179eed37bf45d8b3e7ce,Encuesta,El producto dejó de funcionar al poco tiempo de usarlo.,Negativa,revision_codex_1
+6d5f3ecef804590a69ea235ba0575adbeb1c3a6fcb89e294ea8945b53731b0ca,Social,Producto llegó rápido y funciona perfecto,Positiva,revision_codex_1
+22c2aaaab004ab593d9749691d3dd3d8a4336671d5191e34b9dcf16480e7b42e,Web,Producto llegó rápido y funciona perfecto. Muy recomendable.,Positiva,revision_codex_1
+3df3a2fbf62722717a96fb5f0c836c230b99760af76742eebc5bcb911ff0f1b8,Encuesta,"El producto superó mis expectativas, muy recomendable.",Positiva,revision_codex_1
+a3d0b079e5f3e28c5632cf2e971266b1db3da2f04d534207ef7059370989b024,Social,"Calidad superior, muy contento",Positiva,revision_codex_1
+ba18ce2c84d0bb038167d806d8634ab1dbcc961bc6d7de28a330495a3a10ca9a,Web,"Es lo que esperaba, nada excepcional. OK.",Neutra,revision_codex_1
+d09159cc40cbd63396795e6ada0a45b14f7678e734a9c302c7f56974cabeed99,Encuesta,"El producto está bien, pero esperaba un poco más de calidad.",Neutra,revision_codex_1
+c8fc829b14075529e346e56731cdec36268ad85f4bb02ec3529a6a4b4addf638,Social,"Muy satisfecho con la compra, lo recomiendo",Positiva,revision_codex_1
+2b28126a058cf21962ac4af7d96bc861cc35237eee3afc1b3fc727f4f1670ef2,Web,"Producto recibido, cumple su función. OK.",Neutra,revision_codex_1
+4c45b5f47f90dd3265be49f0c1eae2954823b0e9ba27bcfcaf87c0b38a6f6e11,Encuesta,El producto llegó dañado y no cumplió con lo prometido.,Negativa,revision_codex_1
+7f826373a512604b30ed5995841ba4f791f615875598b9a700a39ebcf885ff58,Social,"No cumple con lo anunciado, insatisfecho",Negativa,revision_codex_1
+2bafca0ac8288c303160f202504078e1486bc709373c56485f8ecd4763fa5122,Web,Satisface lo básico. OK.,Neutra,revision_codex_1
+62e1ba0b6e4c88ff1dee576cdac6c824b2606146e0d2f4d6e13c7ad70854eec9,Encuesta,"Me encanta, es justo lo que necesitaba.",Positiva,revision_codex_1
+b7dfc151257d61a60f79a0e66c640630f4cd64644efd0590c201ca6eacb248a6,Social,"Me encanta este producto, excelente calidad",Positiva,revision_codex_1
+24bd50cb3feef72bae9ee0de0f4ca0e5dbbd50a01b798e3fef64b5c90be24023,Web,"No funciona como esperaba, decepcionado. No volvería a comprar.",Negativa,revision_codex_1
+ea7d00086e89ce12d5469a4126a5013c908524dfe51dad620935ea2f347cc539,Encuesta,"Excelente calidad, definitivamente volvería a comprar.",Positiva,revision_codex_1
+5b333cbdf6db200f564cb657ab5d69423840a163588e14feef960e81e9629e68,Social,"Muy mala calidad, se rompió rápido",Negativa,revision_codex_1
+2250180a9f4673329d990e876613a3e67d863e44a3863d305805f8cbf8aa404d,Web,"No cumple con lo anunciado, insatisfecho. No volvería a comprar.",Negativa,revision_codex_1
+24a45c00a19c5a76941e557007dbd3a504d99fe5eb458131997c9becdc180c8e,Encuesta,El servicio fue lento y el soporte no resolvió mi problema.,Negativa,revision_codex_1
+2a88948bf6a0a0e0fa5a45575e92ffc1f730a86886fc66587e0c5859c0ee3bca,Social,Pésima atención al cliente,Negativa,revision_codex_1
+b4131c47de6075485c079cd6d0d2d17b30f385e50db821a38da661f496043a6c,Web,"Calidad superior, muy contento. Muy recomendable.",Positiva,revision_codex_1
+3915c87952b8fa216b9ef7b13cdfb5ea88a28096541ac969dc0c81b0cf492d0c,Encuesta,"El producto cumple su función, nada especial.",Neutra,revision_codex_1
+d21cd1e8457e102ba3af42ba6aec1c6cd3e021825f760ed6e5921317fd249fe8,Social,"Entrega correcta, sin comentarios adicionales",Neutra,revision_codex_1
+2ac6a6f674bb4b543ebb82afbc70d60e5a35b1790bd7c321d9886c8ed7ce1fe4,Web,"Muy mala calidad, se rompió rápido. No volvería a comprar.",Negativa,revision_codex_1
+d99604695fdc70d6a9f87e7b347c54b7291e1ce8a17fe1167a15b9c7a302c0b8,Encuesta,"El envío fue normal, dentro del tiempo esperado.",Neutra,revision_codex_1
+04e399fa17f7662b9bcdd5e4efb0b270a3270d30208146a07f15abd72053c085,Social,"Es lo que esperaba, nada excepcional",Neutra,revision_codex_1
+4f9a86ef25936ddcba85868dc003e883f0bc8fe4d0deb87c20d8a91103f4188d,Web,"Muy satisfecho con la compra, lo recomiendo. Muy recomendable.",Positiva,revision_codex_1
