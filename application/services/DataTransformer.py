@@ -94,7 +94,7 @@ class DataTransformer(ITransformer):
                     datos, validos, "integridad_referencial", motivos
                 )
 
-        for columna in ("Nombre", "email", "TipoFuente", "Comentario"):
+        for columna in ("Nombre", "email", "TipoFuente", "Comentario", "IdOrigen"):
             if columna in datos.columns:
                 datos[columna] = datos[columna].astype("string").str.strip()
         if "email" in datos.columns:
@@ -139,7 +139,7 @@ class DataTransformer(ITransformer):
                 datos, validos, "email_invalido", motivos
             )
 
-        for columna in ("Nombre", "email", "TipoFuente", "Comentario"):
+        for columna in ("Nombre", "email", "TipoFuente", "Comentario", "IdOrigen"):
             if columna in self.columnas_requeridas and columna in datos.columns:
                 validos = datos[columna].astype("string").str.strip().ne("")
                 datos = self._conservar_validos(

@@ -4,7 +4,7 @@
 from datetime import date, datetime
 
 import pandas as pd
-from sqlalchemy import MetaData, Table, inspect, select
+from sqlalchemy import MetaData, Table, inspect, select, update
 from sqlalchemy.exc import SQLAlchemyError
 
 from application.exceptions.etl_exceptions import PersistenceError
@@ -33,16 +33,32 @@ class SqlLoader(ILoader):
             tabla = Table(self.nombre_tabla, MetaData(), autoload_with=self.db_engine)
             pendientes = datos.copy()
             columnas_clave = [c for c in self.claves_duplicados if c in pendientes.columns]
+            actualizaciones_origen = []
 
             if columnas_clave:
+                opinion = self.nombre_tabla == "Opinion" and "IdOrigen" in pendientes.columns
+                columnas_consulta = [tabla.c[columna] for columna in columnas_clave]
+                if opinion:
+                    columnas_consulta += [tabla.c.IdOpinion, tabla.c.IdOrigen]
                 existentes = pd.read_sql(
-                    select(*(tabla.c[columna] for columna in columnas_clave)),
+                    select(*columnas_consulta),
                     con=self.db_engine,
                 )
                 claves_existentes = {
                     tuple(self._normalizar(valor) for valor in fila)
-                    for fila in existentes.itertuples(index=False, name=None)
+                    for fila in existentes[columnas_clave].itertuples(index=False, name=None)
                 }
+                if opinion:
+                    registros_existentes = {
+                        tuple(self._normalizar(valor) for valor in fila[:len(columnas_clave)]):
+                        (fila[-2], fila[-1])
+                        for fila in existentes.itertuples(index=False, name=None)
+                    }
+                    for fila in pendientes.itertuples(index=False):
+                        clave = tuple(self._normalizar(getattr(fila, c)) for c in columnas_clave)
+                        anterior = registros_existentes.get(clave)
+                        if anterior and str(anterior[1] or "").startswith("CSV_"):
+                            actualizaciones_origen.append((anterior[0], str(fila.IdOrigen)))
                 nuevas = pendientes[columnas_clave].apply(
                     lambda fila: tuple(self._normalizar(valor) for valor in fila), axis=1
                 ).map(lambda clave: clave not in claves_existentes)
@@ -57,14 +73,17 @@ class SqlLoader(ILoader):
                 )
 
             rechazados = len(datos) - len(pendientes)
-            if not pendientes.empty:
+            if not pendientes.empty or actualizaciones_origen:
                 with self.db_engine.begin() as connection:
-                    pendientes.to_sql(
-                        self.nombre_tabla,
-                        con=connection,
-                        if_exists="append",
-                        index=False,
-                    )
+                    for id_opinion, id_origen in actualizaciones_origen:
+                        connection.execute(update(tabla).where(tabla.c.IdOpinion == id_opinion).values(IdOrigen=id_origen))
+                    if not pendientes.empty:
+                        pendientes.to_sql(
+                            self.nombre_tabla,
+                            con=connection,
+                            if_exists="append",
+                            index=False,
+                        )
             return len(pendientes), rechazados
         except (SQLAlchemyError, ValueError, TypeError, KeyError, AttributeError) as error:
             raise PersistenceError(

@@ -21,10 +21,12 @@ class Settings:
 
     db_server: str = "localhost"
     db_name: str = "OpinionesETL"
+    dw_name: str = "OpinionesDW"
     db_driver: str = "ODBC Driver 17 for SQL Server"
     db_trusted_connection: bool = True
     db_user: str = ""
     db_password: str = ""
+    db_trust_server_certificate: bool = False
 
     @classmethod
     def from_environment(cls) -> "Settings":
@@ -42,28 +44,36 @@ class Settings:
         return cls(
             db_server=os.getenv("DB_SERVER", os.getenv("SQL_SERVER", "localhost")),
             db_name=os.getenv("DB_NAME", os.getenv("SQL_DATABASE", "OpinionesETL")),
+            dw_name=os.getenv("DW_NAME", "OpinionesDW"),
             db_driver=os.getenv("DB_DRIVER", os.getenv("ODBC_DRIVER", "ODBC Driver 17 for SQL Server")),
             db_trusted_connection=trusted,
             db_user=os.getenv("DB_USER", ""),
             db_password=os.getenv("DB_PASSWORD", ""),
+            db_trust_server_certificate=os.getenv("DB_TRUST_SERVER_CERTIFICATE", "no").strip().lower() in {"1", "true", "yes", "y", "si"},
         )
 
     @property
     def connection_string(self) -> str:
         """Devuelve la URL de conexión que consume SQLAlchemy."""
 
+        return self.connection_string_for(self.db_name)
+
+    def connection_string_for(self, database: str) -> str:
+        """Construye una conexión para la base relacional o el DW."""
+
         driver = quote_plus(self.db_driver)
+        certificate = "yes" if self.db_trust_server_certificate else "no"
         if self.db_trusted_connection:
             return (
-                f"mssql+pyodbc://@{self.db_server}/{self.db_name}?"
-                f"driver={driver}&trusted_connection=yes&encrypt=yes&trustServerCertificate=yes"
+                f"mssql+pyodbc://@{self.db_server}/{database}?"
+                f"driver={driver}&trusted_connection=yes&encrypt=yes&trustServerCertificate={certificate}"
             )
 
         user = quote_plus(self.db_user)
         password = quote_plus(self.db_password)
         return (
-            f"mssql+pyodbc://{user}:{password}@{self.db_server}/{self.db_name}?"
-            f"driver={driver}&encrypt=yes&trustServerCertificate=yes"
+            f"mssql+pyodbc://{user}:{password}@{self.db_server}/{database}?"
+            f"driver={driver}&encrypt=yes&trustServerCertificate={certificate}"
         )
 
 

@@ -23,6 +23,7 @@ class PipelineResult:
     inserted: int
     rejected: int
     rejection_reasons: Dict[str, int] = field(default_factory=dict)
+    already_loaded: int = 0
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class ETLResult:
     inserted: int = 0
     rejected: int = 0
     rejection_reasons: Dict[str, int] = field(default_factory=dict)
+    already_loaded: int = 0
 
     def add(self, result: PipelineResult) -> "ETLResult":
         """Combina las métricas de un pipeline sin mutar el resultado."""
@@ -44,6 +46,7 @@ class ETLResult:
             rejection_reasons=self._merge_reasons(
                 self.rejection_reasons, result.rejection_reasons
             ),
+            already_loaded=self.already_loaded + result.already_loaded,
         )
 
     @staticmethod

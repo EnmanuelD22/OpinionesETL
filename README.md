@@ -46,6 +46,9 @@ DB_SERVER=.\SQLEXPRESS
 DB_NAME=OpinionesETL
 DB_DRIVER=ODBC Driver 17 for SQL Server
 DB_TRUSTED_CONNECTION=yes
+DW_NAME=OpinionesDW
+# Solo para una instancia de desarrollo con certificado autofirmado:
+DB_TRUST_SERVER_CERTIFICATE=yes
 ```
 
 Ejecutar el proceso:
@@ -54,9 +57,35 @@ Ejecutar el proceso:
 python main.py
 ```
 
-La aplicación crea las tablas que no existan, prepara las categorías y
-clasificaciones requeridas y procesa las cargas en orden: fuentes de datos,
-clientes, productos y opiniones.
+Antes de ejecutar en SQL Server, crear las bases con los scripts originales
+`BaseRelacional.sql` y `DataWareHouse.sql`. Después ejecutar, en ese orden,
+[`sql/001_OpinionesETL.sql`](sql/001_OpinionesETL.sql) y
+[`sql/002_OpinionesDW.sql`](sql/002_OpinionesDW.sql). Las migraciones son
+idempotentes y no borran datos existentes.
+
+La aplicación carga fuentes, clientes, productos y opiniones en `OpinionesETL`.
+Luego clasifica opiniones sin etiqueta original y sincroniza dimensiones y hechos
+en `OpinionesDW`. Puede repetirse sin duplicar hechos ni predicciones. Las
+etiquetas de encuestas se conservan; las predicciones se guardan aparte en
+`AnalisisOpinion` con confianza y versión del clasificador.
+Al reprocesar los archivos, el cargador actualiza `IdOrigen` de las filas
+anteriores que aún tengan valores `CSV_*`, sin volver a insertarlas.
+
+La clasificación incluida es una línea base léxica local en español. Debe
+evaluarse con comentarios reales y etiquetas revisadas antes de usarse para
+decisiones comerciales. Una confianza de 0 indica que no se encontraron palabras
+del léxico. Los datos inconsistentes de muestra son intencionales.
+
+Opcionalmente, las reseñas web pueden extraerse de otra base relacional en la
+misma instancia, con una tabla que tenga las columnas del CSV `web_reviews.csv`:
+
+```env
+WEB_SOURCE_DB_NAME=BaseResenas
+WEB_SOURCE_TABLE=WebReviews
+```
+
+Si no se configura, se conserva `data/web_reviews.csv`. La API REST queda para
+una fase posterior, según el alcance acordado.
 
 ## Archivos CSV
 
@@ -78,8 +107,11 @@ clientes, productos y opiniones.
 - Detecta duplicados dentro de los archivos y en la base de datos.
 - Valida las referencias de clientes, productos, fuentes y clasificaciones.
 - Carga los registros respetando las claves primarias y foráneas.
-- Muestra los registros procesados, insertados y rechazados por pipeline.
+- Muestra los registros procesados, insertados, rechazados y ya existentes por pipeline.
 - Presenta un resumen final con los principales motivos de rechazo.
+
+Los totales y motivos se muestran en consola durante la ejecución. Los
+registros ya existentes no se cuentan como errores de calidad.
 
 Los errores de lectura, transformación, catálogo o persistencia se manejan
 mediante excepciones específicas y detienen la ejecución cuando la operación
@@ -95,6 +127,38 @@ python -m unittest discover -s tests -v
 
 Las pruebas utilizan SQLite en memoria para validar el flujo sin modificar la
 base de datos SQL Server.
+
+Incluyen una carga integral de la base relacional al DW, clasificación de texto,
+extracción desde una tabla SQL y una segunda ejecución sin duplicados.
+
+## Indicadores y rendimiento
+
+El dashboard local se inicia con `python dashboard.py` y abre en
+`http://127.0.0.1:8765`. Lee `OpinionesDW`, permite filtrar por producto y mes,
+y muestra cantidad, sentimiento, satisfacción y tendencia mensual.
+Satisfacción se define como **opiniones positivas / opiniones clasificadas**;
+las neutras cuentan en el denominador. Las vistas SQL usan la misma fórmula.
+
+Para Power BI, conectar a `OpinionesDW`. La tabla de hechos y las seis dimensiones
+mantienen el modelo estrella y permiten crear medidas propias. Las vistas ofrecen
+un inicio rápido:
+
+| Vista | Uso sugerido |
+|---|---|
+| `vw_KPIGeneral` | Tarjetas de opiniones analizadas, clases y satisfacción global |
+| `vw_KPIProductoMes` | Tendencia mensual y comparación por producto |
+| `vw_ClasificacionPorCanal` | Distribución de opiniones por canal y tipo |
+| `vw_OpinionesDetalle` | Tabla filtrable por fecha, producto, canal y clasificación |
+
+Los registros procesados y rechazados son métricas de ejecución mostradas en
+consola; el DW contiene únicamente opiniones válidas. No se deben sumar los
+porcentajes de vistas agregadas: calcular satisfacción con positivas / total
+en el contexto de filtros de Power BI.
+
+Para verificar la meta de 50.000 comentarios en menos de 5 minutos, usar una
+muestra de al menos ese tamaño en SQL Server y ejecutar `python benchmark.py`.
+El script falla si el volumen o el tiempo no cumplen la meta. La muestra actual
+de 1.700 registros no permite certificar ese requisito.
 
 ## Organización
 

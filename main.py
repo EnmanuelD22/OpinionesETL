@@ -2,6 +2,8 @@
 
 #region Imports
 from infrastructure.composition import create_application
+from infrastructure.database import get_engine, get_dw_engine
+from infrastructure.services.WarehouseSync import sincronizar_warehouse
 #endregion
 
 
@@ -9,7 +11,14 @@ from infrastructure.composition import create_application
 def main() -> dict[str, int]:
     """Construye y ejecuta la aplicación configurada."""
 
-    return create_application().ejecutar()
+    application = create_application()
+    resultado = application.ejecutar()
+    dw = get_dw_engine()
+    try:
+        print("Carga analítica:", sincronizar_warehouse(get_engine(), dw))
+    finally:
+        dw.dispose()
+    return resultado
 #endregion
 
 

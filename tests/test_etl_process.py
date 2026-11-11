@@ -115,6 +115,7 @@ class ETLProcessTests(unittest.TestCase):
     def test_complete_process_runs_against_sqlite_without_sql_server(self):
         data_dir = Path(__file__).resolve().parents[1] / "data"
         db_engine = create_engine("sqlite:///:memory:")
+        self.addCleanup(db_engine.dispose)
         application = build_etl_application(
             data_dir=data_dir,
             catalog_service=SqlCatalogService(

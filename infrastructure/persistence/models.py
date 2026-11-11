@@ -72,4 +72,15 @@ class OpinionModel(Base):
     IdClasificacion = Column(Integer, ForeignKey("Clasificacion.IdClasificacion"))
     IdFuente = Column(Integer, ForeignKey("Fuente_Datos.IdFuente"))
     IdTipoOpinion = Column(Integer, ForeignKey("TipoOpinion.IdTipoOpinion"))
+
+
+class AnalisisOpinionModel(Base):
+    __tablename__ = "AnalisisOpinion"
+
+    IdOpinion = Column(Integer, ForeignKey("Opinion.IdOpinion"), primary_key=True)
+    IdClasificacion = Column(Integer, ForeignKey("Clasificacion.IdClasificacion"), nullable=False)
+    Confianza = Column(Float, nullable=False)
+    ModeloVersion = Column(String(50), nullable=False)
+
+
 #endregion

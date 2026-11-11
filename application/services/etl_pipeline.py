@@ -45,17 +45,15 @@ class ETLPipeline:
         resultado = PipelineResult(
             processed=len(datos),
             inserted=insertados,
-            rejected=rechazados_transformacion + rechazados_carga,
-            rejection_reasons={
-                **getattr(self.transformer, "last_rejection_reasons", {}),
-                **({"duplicado_en_base": rechazados_carga} if rechazados_carga else {}),
-            },
+            rejected=rechazados_transformacion,
+            rejection_reasons=getattr(self.transformer, "last_rejection_reasons", {}),
+            already_loaded=rechazados_carga,
         )
         self.last_result = resultado
         print(
             f"Procesados: {resultado.processed} | "
             f"Insertados: {resultado.inserted} | "
-            f"Rechazados: {resultado.rejected}"
+            f"Rechazados: {resultado.rejected} | Ya existentes: {resultado.already_loaded}"
         )
         return {
             "procesados": resultado.processed,
@@ -105,7 +103,8 @@ class ETLApplication:
         print(
             f"Procesados: {resultado['procesados']} | "
             f"Insertados: {resultado['insertados']} | "
-            f"Rechazados: {resultado['rechazados']}"
+            f"Rechazados: {resultado['rechazados']} | "
+            f"Ya existentes: {acumulado.already_loaded}"
         )
         if acumulado.rejection_reasons:
             motivos = ", ".join(
@@ -115,8 +114,7 @@ class ETLApplication:
             print(f"Motivos de rechazo: {motivos}")
         return resultado
 
-    @staticmethod
-    def _resultado(pipeline: ETLPipeline) -> PipelineResult:
+    def _resultado(self, pipeline: ETLPipeline) -> PipelineResult:
         pipeline.ejecutar()
         if pipeline.last_result is None:
             raise RuntimeError("El pipeline no produjo un resultado")

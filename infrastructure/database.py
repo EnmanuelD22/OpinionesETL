@@ -24,4 +24,10 @@ def get_engine():
     """Devuelve el motor configurado para la ejecución actual."""
 
     return engine
+
+
+def get_dw_engine():
+    """Motor del warehouse, creado solo cuando se solicita la carga analítica."""
+    return create_engine(settings.connection_string_for(settings.dw_name),
+                         echo=False, fast_executemany=True)
 #endregion
