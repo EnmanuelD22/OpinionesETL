@@ -36,6 +36,7 @@ class DataTransformer(ITransformer):
         self.referencias = dict(referencias or {})
         self.esquema = esquema or self._esquema_implicit()
         self.last_rejection_reasons: dict[str, int] = {}
+        self.last_rejections = pd.DataFrame(columns=["IdOrigen", "Motivo"])
     #endregion
 
     #region Transformation
@@ -59,6 +60,7 @@ class DataTransformer(ITransformer):
 
         total = len(datos)
         datos["_etl_row_id"] = range(total)
+        origenes = datos["IdOrigen"].copy() if "IdOrigen" in datos else None
         motivos: dict[int, str] = {}
 
         duplicados = ~datos.duplicated(subset=self.clave_duplicados, keep="first")
@@ -111,6 +113,9 @@ class DataTransformer(ITransformer):
                 )
 
         if "Puntaje" in datos.columns:
+            puntaje_informado = datos["Puntaje"].notna() & datos["Puntaje"].astype(
+                "string"
+            ).str.strip().ne("").fillna(False)
             datos["Puntaje"] = pd.to_numeric(datos["Puntaje"], errors="coerce")
             regla_puntaje = next(
                 (regla for regla in self.esquema.rules if regla.name == "Puntaje"),
@@ -119,6 +124,8 @@ class DataTransformer(ITransformer):
             minimo = 1 if regla_puntaje.minimum is None else regla_puntaje.minimum
             maximo = 5 if regla_puntaje.maximum is None else regla_puntaje.maximum
             validos = datos["Puntaje"].between(minimo, maximo, inclusive="both")
+            if not regla_puntaje.required:
+                validos = validos | ~puntaje_informado
             datos = self._conservar_validos(
                 datos, validos, "puntaje_invalido", motivos
             )
@@ -158,6 +165,14 @@ class DataTransformer(ITransformer):
                 datos[columna] = datos[columna].astype("int64")
 
         self.last_rejection_reasons = dict(Counter(motivos.values()))
+        self.last_rejections = pd.DataFrame(
+            [
+                {"IdOrigen": None if origenes is None else str(origenes.iloc[row_id]),
+                 "Motivo": motivo}
+                for row_id, motivo in sorted(motivos.items())
+            ],
+            columns=["IdOrigen", "Motivo"],
+        )
         datos = datos.drop(columns=["_etl_row_id"])
         if self.columnas_salida:
             datos = datos[self.columnas_salida]

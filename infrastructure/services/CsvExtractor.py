@@ -15,14 +15,15 @@ class CsvExtractor(IExtractor):
     """Implementa `IExtractor` para un archivo CSV local."""
 
     #region Construction
-    def __init__(self, file_path):
+    def __init__(self, file_path, dtypes=None):
         self.file_path = Path(file_path)
+        self.dtypes = dtypes
     #endregion
 
     #region Extraction
     def extract(self):
         try:
-            data = pd.read_csv(self.file_path, encoding="utf-8")
+            data = pd.read_csv(self.file_path, encoding="utf-8", dtype=self.dtypes)
         except (OSError, UnicodeError, pd.errors.ParserError) as error:
             raise ExtractionError(
                 f"Error al leer el archivo CSV {self.file_path}: {error}"

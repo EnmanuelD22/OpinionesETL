@@ -12,10 +12,21 @@ __pycache__/
 # Configuracion del editor
 .vscode/
 
+# Instrucciones, agentes y skills personales de Codex
+AGENTS.md
+.codex/
+.agents/
+
+# Documentos personales y entregables locales
+docs/local/
+*.pdf
+*.docx
+
 # Logs
 *.log
+tmp/
 
-# Muestras de anotacion y evaluaciones NLP privadas
+# Muestras de anotación y evaluaciones con comentarios reales
 evaluation/private/
 .cache/
 reports/

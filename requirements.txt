@@ -5,5 +5,9 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.4
 six==1.17.0
 SQLAlchemy==2.1.4
+fastapi==0.162.4
+starlette==0.46.2
+uvicorn==0.54.0
+httpx==0.28.1
 typing_extensions==4.16.0
 tzdata==2026.5
